@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-"""flask"""
-from flask import Flask, render_template, jsonify
+"""the flask"""
 from models import storage
+from flask import Flask, render_template, jsonify
 from api.v1.views import app_views
 from os import getenv
 from flask_cors import CORS
@@ -15,14 +15,14 @@ cors = CORS(app, resources={'/*': {'origins': '0.0.0.0'}})
 
 
 @app.teardown_appcontext
-def teardown_db(self):
-    """teardown"""
+def tear_db(self):
+    """func teardown"""
     storage.close()
 
 
 @app.errorhandler(404)
-def page_not_found(e):
-    """404ed"""
+def page_not_f(el):
+    """func to 404ed"""
     return jsonify({"error": "Not found"}), 404
 
 

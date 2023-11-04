@@ -1,31 +1,32 @@
 #!/usr/bin/python3
-""" state view """
+"""func to state view """
+from models import storage
 from api.v1.views import app_views
 from flask import jsonify, Blueprint, make_response, abort, request
-from models import storage
 from models.state import State
 from models.base_model import BaseModel
 
 
 @app_views.route('/states', methods=["GET", "POST"], strict_slashes=False)
 def get_all_st():
-    """ retrieves all state objects """
+    """ func to retrieves all state objects """
     if request.method == 'GET':
-        output = []
+        outp = []
         states = storage.all(State).values()
 
         for state in states:
-            output.append(state.to_dict())
-        return (jsonify(output))
+            outp.append(state.to_dict())
+        return (jsonify(outp))
 
     if request.method == 'POST':
-        data = request.get_json()
+        datax = request.get_json()
+
         if not request.is_json:
             abort(400, description="Not a JSON")
         if 'name' not in request.json:
             abort(400, description="Missing name")
 
-        state = State(**data)
+        state = State(**datax)
         state.save()
         return (jsonify(state.to_dict()), 201)
 
@@ -33,22 +34,23 @@ def get_all_st():
 @app_views.route('/states/<state_id>', methods=["GET", "PUT"],
                  strict_slashes=False)
 def get_state(state_id):
-    """ retrieves one unique state object """
+    """ func to retrieves one unique state object """
     state = storage.get(State, state_id)
 
     if state is None:
         abort(404)
     if request.method == "GET":
-        output = state.to_dict()
-        return (jsonify(output))
+        outp = state.to_dict()
+        return (jsonify(outp))
+
     if request.method == "PUT":
         print("test\n")
-        data = request.get_json()
+        datax = request.get_json()
 
         if not request.is_json:
             abort(400, description="Not a JSON")
-        for key, value in data.items():
-            setattr(state, key, value)
+        for key, val in datax.items():
+            setattr(state, key, val)
         state.save()
 
         return (jsonify(state.to_dict()), 200)
@@ -57,7 +59,7 @@ def get_state(state_id):
 @app_views.route('/states/<state_id>', methods=["GET", "DELETE"],
                  strict_slashes=False)
 def del_state(state_id):
-    """ delete one unique state object """
+    """ func to delete one unique state object """
     state = storage.get(State, state_id)
 
     if state is None:

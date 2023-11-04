@@ -1,8 +1,8 @@
 #!/usr/bin/python3
-""" user view """
+""" func to user view """
+from models import storage
 from api.v1.views import app_views
 from flask import jsonify, Blueprint, make_response, abort, request
-from models import storage
 from models.user import User
 from models.base_model import BaseModel
 
@@ -10,16 +10,18 @@ from models.base_model import BaseModel
 @app_views.route('/users', methods=["GET", "POST"],
                  strict_slashes=False)
 def get_all():
-    """ retrieves all user objects """
-    output = []
+    """ func to retrieves all user objects """
+    outp = []
     users = storage.all(User).values()
 
     if request.method == "GET":
         for user in users:
-            output.append(user.to_dict())
-        return (jsonify(output))
+            outp.append(user.to_dict())
+        return (jsonify(outp))
+
     if request.method == "POST":
-        data = request.get_json()
+        datax = request.get_json()
+
         if not request.is_json:
             abort(400, description="Not a JSON")
         if 'email' not in request.json:
@@ -27,7 +29,7 @@ def get_all():
         if 'password' not in request.json:
             abort(400, description="Missing password")
 
-        user = User(**data)
+        user = User(**datax)
         user.save()
         return (jsonify(user.to_dict()), 201)
 
@@ -35,19 +37,21 @@ def get_all():
 @app_views.route('/users/<user_id>', methods=["GET", "PUT", "DELETE"],
                  strict_slashes=False)
 def get_user(user_id):
-    """ retrieves one unique user object """
+    """ func to retrieves one unique user object """
     user = storage.get(User, user_id)
 
     if user is None:
         abort(404)
     if request.method == "GET":
-        output = user.to_dict()
-        return (jsonify(output))
+        outp = user.to_dict()
+        return (jsonify(outp))
+
     if request.method == "PUT":
-        data = request.get_json()
+        datax = request.get_json()
         if not request.is_json:
             abort(400, description="Not a JSON")
-        for key, value in data.items():
+
+        for key, value in datax.items():
             setattr(user, key, value)
         user.save()
         return (jsonify(user.to_dict()), 200)
